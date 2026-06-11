@@ -38,6 +38,8 @@
   --shadow-menu: 0 6px 20px rgba(20,24,33,0.10);
   --shadow-modal: 0 18px 50px rgba(20,24,33,0.20);
   --ring: 0 0 0 3px rgba(31,85,98,0.22);
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 * { box-sizing: border-box; }
@@ -148,9 +150,9 @@ html, body {
   margin-bottom: var(--sp-sm);
   text-align: center;
   border: 1px solid transparent;
-  animation: settle 280ms ease;
+  animation: settle 320ms var(--ease-out-quart);
 }
-@keyframes settle { from { transform: translateY(-4px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes settle { from { transform: translateY(-8px) scale(0.985); opacity: 0; } to { transform: none; opacity: 1; } }
 .solved-row.t1 { background: var(--t1-wash); border-color: color-mix(in srgb, var(--t1) 28%, var(--line)); }
 .solved-row.t2 { background: var(--t2-wash); border-color: color-mix(in srgb, var(--t2) 28%, var(--line)); }
 .solved-row.t3 { background: var(--t3-wash); border-color: color-mix(in srgb, var(--t3) 28%, var(--line)); }
@@ -212,14 +214,29 @@ html, body {
   transform: translateY(-1px);
 }
 .tile.disabled { pointer-events: none; opacity: 0.5; }
-.tile.shake { animation: shake 380ms ease; }
+/* wrong guess: a quick horizontal jiggle on the selected tiles */
+.tile.shake { animation: shake 440ms ease; }
 @keyframes shake {
   0%,100% { transform: translateX(0); }
-  20% { transform: translateX(-6px); } 40% { transform: translateX(6px); }
-  60% { transform: translateX(-4px); } 80% { transform: translateX(4px); }
+  15% { transform: translateX(-7px); }
+  30% { transform: translateX(7px); }
+  45% { transform: translateX(-5px); }
+  60% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+  90% { transform: translateX(3px); }
 }
+/* tap feedback on select */
 .tile.pop { animation: pop 240ms ease; }
 @keyframes pop { 50% { transform: scale(1.06); } }
+/* correct group: a celebratory hop (staggered via inline animation-delay) */
+.tile.jump { animation: tileJump 360ms ease both; z-index: 2; }
+@keyframes tileJump {
+  0%   { transform: translateY(0) scale(1); }
+  35%  { transform: translateY(-16px) scale(1.05); }
+  100% { transform: translateY(0) scale(1); }
+}
+/* FLIP reflow: remaining tiles glide into their new spots */
+.tile.reflow { transition: transform 360ms var(--ease-out-quart); will-change: transform; }
 
 /* image tiles */
 .tile.has-image { padding: 0; }

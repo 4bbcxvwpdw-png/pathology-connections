@@ -270,24 +270,71 @@
   function solveGroup(gi) {
     busy = true;
     var picks = selected.slice();
-    // pop animation
-    picks.forEach(function (id) {
-      var b = el.grid.querySelector('.tile[data-id="' + id + '"]');
-      if (b) b.classList.add("pop");
+
+    if (reduceMotion()) { collapseSolved(gi, picks, false); return; }
+
+    // Phase 1: a staggered celebratory hop, left-to-right by screen position.
+    var pickEls = picks
+      .map(function (id) { return el.grid.querySelector('.tile[data-id="' + id + '"]'); })
+      .filter(Boolean)
+      .sort(function (a, b) {
+        var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+        return (ra.top - rb.top) || (ra.left - rb.left);
+      });
+    pickEls.forEach(function (b, i) {
+      b.style.animationDelay = (i * 110) + "ms";
+      b.classList.add("jump");
     });
-    setTimeout(function () {
-      solvedOrder.push(gi);
-      order = order.filter(function (id) { return picks.indexOf(id) < 0; });
-      selected = [];
-      renderSolvedRow(gi, true);
-      renderGrid();
-      busy = false;
-      updateControls();
-      saveState();
-      if (solvedOrder.length === 4) {
-        setTimeout(function () { winGame(); }, 350);
-      }
-    }, 280);
+    var jumpTotal = 360 + (Math.max(pickEls.length - 1, 0)) * 110 + 60;
+    setTimeout(function () { collapseSolved(gi, picks, true); }, jumpTotal);
+  }
+
+  // Phase 2: lock the group into its color bar; remaining tiles reflow (FLIP).
+  function collapseSolved(gi, picks, animate) {
+    var prev = {};
+    if (animate) {
+      Array.prototype.forEach.call(el.grid.querySelectorAll(".tile"), function (e2) {
+        prev[e2.getAttribute("data-id")] = e2.getBoundingClientRect();
+      });
+    }
+    solvedOrder.push(gi);
+    order = order.filter(function (id) { return picks.indexOf(id) < 0; });
+    selected = [];
+    renderSolvedRow(gi, true);
+    renderGrid();
+    if (animate) flipReflow(prev);
+
+    busy = false;
+    updateControls();
+    saveState();
+    if (solvedOrder.length === 4) {
+      setTimeout(function () { winGame(); }, animate ? 460 : 200);
+    }
+  }
+
+  // FLIP: animate each surviving tile from its old box to its new one.
+  function flipReflow(prev) {
+    order.forEach(function (id) {
+      var node = el.grid.querySelector('.tile[data-id="' + id + '"]');
+      var before = prev[String(id)];
+      if (!node || !before) return;
+      var now = node.getBoundingClientRect();
+      var dx = before.left - now.left, dy = before.top - now.top;
+      if (!dx && !dy) return;
+      node.style.transition = "none";
+      node.style.transform = "translate(" + dx + "px," + dy + "px)";
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          node.classList.add("reflow");
+          node.style.transform = "";
+        });
+      });
+      setTimeout(function () {
+        node.classList.remove("reflow");
+        node.style.transition = "";
+        node.style.transform = "";
+      }, 440);
+    });
   }
 
   function shakeSelected() {
@@ -559,6 +606,10 @@
   // ============================================================
   // helpers
   // ============================================================
+  function reduceMotion() {
+    try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
+    catch (e) { return false; }
+  }
   function shuffleArray(a) {
     for (var i = a.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));

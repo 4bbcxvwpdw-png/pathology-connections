@@ -42,6 +42,7 @@
   var over = false;
   var gameWon = false;
   var viewingArchive = false;
+  var ending = false;    // guard so the win/loss reveal can only run once
   var busy = false;
 
   // ============================================================
@@ -85,6 +86,7 @@
     over = false;
     gameWon = false;
     viewingArchive = false;
+    ending = false;
 
     el.loading.style.display = "none";
     el.error.style.display = "none";
@@ -101,7 +103,8 @@
       if (validSaved(saved)) {
         order = saved.order;
         selected = (saved.selected || []).filter(function (i) { return order.indexOf(i) >= 0; });
-        solvedOrder = saved.solvedOrder || [];
+        // de-dupe in case an older bug saved repeated groups (self-heals the board)
+        solvedOrder = (saved.solvedOrder || []).filter(function (g, i, arr) { return arr.indexOf(g) === i; });
         guessRows = saved.guessRows || [];
         remaining = typeof saved.remaining === "number" ? saved.remaining : MAX_MISTAKES;
         over = !!saved.over;
@@ -263,6 +266,7 @@
       shakeSelected();
       toast(maxCount === 3 ? "One away…" : "Not a group. Try again.");
       if (remaining <= 0) {
+        over = true;              // lock immediately so extra taps can't double-trigger the reveal
         setTimeout(loseGame, 650);
       }
       updateControls();
@@ -300,16 +304,16 @@
 
   // Lock the group into its color bar; remaining tiles reflow (FLIP).
   function collapseSolved(gi, picks, animate) {
+    var already = solvedOrder.indexOf(gi) >= 0;   // never draw the same bar twice
     var prev = {};
     if (animate) {
       Array.prototype.forEach.call(el.grid.querySelectorAll(".tile"), function (e2) {
         prev[e2.getAttribute("data-id")] = e2.getBoundingClientRect();
       });
     }
-    solvedOrder.push(gi);
+    if (!already) { solvedOrder.push(gi); renderSolvedRow(gi, true); }
     order = order.filter(function (id) { return picks.indexOf(id) < 0; });
     selected = [];
-    renderSolvedRow(gi, true);
     renderGrid();
     if (animate) flipReflow(prev);
     updateControls();
@@ -352,6 +356,8 @@
   // end states
   // ============================================================
   function winGame() {
+    if (ending) return;
+    ending = true;
     over = true;
     gameWon = true;
     persistResult(true);
@@ -361,6 +367,8 @@
   }
 
   function loseGame() {
+    if (ending) return;
+    ending = true;
     over = true;
     gameWon = false;
     selected = [];

@@ -21,7 +21,7 @@
     takeaways: $("takeawaysBtn"), finishedArchive: $("finishedArchiveBtn"),
     shuffle: $("shuffleBtn"), deselect: $("deselectBtn"), submit: $("submitBtn"),
     toast: $("toast"),
-    reviewOverlay: $("reviewOverlay"), reviewClose: $("reviewClose"),
+    reviewInline: $("reviewInline"),
     resultLine: $("resultLine"), resultSquares: $("resultSquares"), resultCap: $("resultCap"),
     reviewGroups: $("reviewGroups"), share: $("shareBtn"), reviewArchive: $("reviewArchiveBtn"),
     archiveOverlay: $("archiveOverlay"), archiveBtn: $("archiveBtn"),
@@ -41,6 +41,7 @@
   var remaining = MAX_MISTAKES;
   var over = false;
   var gameWon = false;
+  var viewingArchive = false;
   var busy = false;
 
   // ============================================================
@@ -83,6 +84,7 @@
     remaining = MAX_MISTAKES;
     over = false;
     gameWon = false;
+    viewingArchive = false;
 
     el.loading.style.display = "none";
     el.error.style.display = "none";
@@ -91,6 +93,7 @@
     el.sub.textContent = (p.title || "") + (p.author ? "  ·  " + p.author : "");
     el.solved.innerHTML = "";
     showPlayingControls();
+    hideInlineReview();
 
     // Resume a saved in-progress (or finished) game for this puzzle.
     if (resume) {
@@ -269,11 +272,17 @@
 
   function solveGroup(gi) {
     busy = true;
-    var picks = selected.slice();
+    resolveGroup(gi, selected.slice(), function () {
+      busy = false;
+      updateControls();
+      if (solvedOrder.length === 4) setTimeout(winGame, reduceMotion() ? 120 : 340);
+    });
+  }
 
-    if (reduceMotion()) { collapseSolved(gi, picks, false); return; }
-
-    // Phase 1: a staggered celebratory hop, left-to-right by screen position.
+  // Animate one group resolving: a staggered hop, then collapse into its color
+  // bar. Reused for the player's correct guesses AND the end-of-game answer reveal.
+  function resolveGroup(gi, picks, onDone) {
+    if (reduceMotion()) { collapseSolved(gi, picks, false); if (onDone) onDone(); return; }
     var pickEls = picks
       .map(function (id) { return el.grid.querySelector('.tile[data-id="' + id + '"]'); })
       .filter(Boolean)
@@ -286,10 +295,10 @@
       b.classList.add("jump");
     });
     var jumpTotal = 360 + (Math.max(pickEls.length - 1, 0)) * 110 + 60;
-    setTimeout(function () { collapseSolved(gi, picks, true); }, jumpTotal);
+    setTimeout(function () { collapseSolved(gi, picks, true); if (onDone) onDone(); }, jumpTotal);
   }
 
-  // Phase 2: lock the group into its color bar; remaining tiles reflow (FLIP).
+  // Lock the group into its color bar; remaining tiles reflow (FLIP).
   function collapseSolved(gi, picks, animate) {
     var prev = {};
     if (animate) {
@@ -303,13 +312,8 @@
     renderSolvedRow(gi, true);
     renderGrid();
     if (animate) flipReflow(prev);
-
-    busy = false;
     updateControls();
     saveState();
-    if (solvedOrder.length === 4) {
-      setTimeout(function () { winGame(); }, animate ? 460 : 200);
-    }
   }
 
   // FLIP: animate each surviving tile from its old box to its new one.
@@ -353,43 +357,43 @@
     persistResult(true);
     saveState();
     showFinishedControls();
-    showReview(true);
+    revealInlineReview(true);
   }
 
   function loseGame() {
     over = true;
     gameWon = false;
-    // reveal remaining groups in tier order
+    selected = [];
+    updateControls();
+
+    // Reveal the unsolved groups one at a time, each with the full resolve
+    // animation and a breather between, so the player can watch the answers fill in.
     var remainingGroups = [];
     for (var gi = 0; gi < puzzle.groups.length; gi++) {
       if (solvedOrder.indexOf(gi) < 0) remainingGroups.push(gi);
     }
     remainingGroups.sort(function (a, b) { return puzzle.groups[a].tier - puzzle.groups[b].tier; });
+
+    var gap = reduceMotion() ? 0 : 520;
     var i = 0;
     (function revealNext() {
       if (i >= remainingGroups.length) {
         persistResult(false);
         saveState();
         showFinishedControls();
-        setTimeout(function () { showReview(false); }, 450);
+        setTimeout(function () { revealInlineReview(false); }, reduceMotion() ? 0 : 450);
         return;
       }
-      var gi = remainingGroups[i++];
-      solvedOrder.push(gi);
-      var picks = tiles.filter(function (t) { return t.group === gi; }).map(function (t) { return t.id; });
-      order = order.filter(function (id) { return picks.indexOf(id) < 0; });
-      renderSolvedRow(gi, true);
-      renderGrid();
-      setTimeout(revealNext, 420);
+      var g = remainingGroups[i++];
+      var picks = tiles.filter(function (t) { return t.group === g; }).map(function (t) { return t.id; });
+      resolveGroup(g, picks, function () { setTimeout(revealNext, gap); });
     })();
-    selected = [];
-    updateControls();
   }
 
   // ============================================================
   // review screen
   // ============================================================
-  function showReview(won, opts) {
+  function revealInlineReview(won, opts) {
     opts = opts || {};
     var mistakes = MAX_MISTAKES - remaining;
     el.resultLine.textContent = opts.archiveView
@@ -439,7 +443,20 @@
       img.addEventListener("click", function () { openLightbox(img.getAttribute("data-img"), img.getAttribute("data-cap")); });
     });
 
-    openOverlay(el.reviewOverlay);
+    // reveal inline, under the board, with a gentle slide + scroll into view
+    el.reviewInline.hidden = false;
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { el.reviewInline.classList.add("show"); });
+    });
+    setTimeout(function () {
+      try { el.reviewInline.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" }); }
+      catch (e) { el.reviewInline.scrollIntoView(); }
+    }, 140);
+  }
+
+  function hideInlineReview() {
+    el.reviewInline.classList.remove("show");
+    el.reviewInline.hidden = true;
   }
 
   // ============================================================
@@ -497,12 +514,38 @@
       });
       item.querySelector('[data-act="takeaways"]').addEventListener("click", function () {
         closeOverlay(el.archiveOverlay);
-        puzzle = p;
-        showReview(true, { archiveView: true });
+        loadSolvedBoard(p);
       });
       el.archiveList.appendChild(item);
     });
     openOverlay(el.archiveOverlay);
+  }
+
+  // Show a past puzzle as a fully-revealed solved board plus its takeaways.
+  function loadSolvedBoard(p) {
+    puzzle = p;
+    tiles = [];
+    var id = 0;
+    p.groups.forEach(function (g, gi) {
+      g.tiles.forEach(function (t) {
+        tiles.push({ id: id++, text: t.text || "", image: t.image || "", alt: t.alt || "", group: gi });
+      });
+    });
+    order = []; selected = []; guessRows = [];
+    remaining = MAX_MISTAKES; over = true; gameWon = true; viewingArchive = true;
+
+    el.loading.style.display = "none";
+    el.error.style.display = "none";
+    el.game.style.display = "block";
+    el.title.textContent = "Pathology Connections";
+    el.sub.textContent = (p.title || "") + (p.author ? "  ·  " + p.author : "");
+    el.solved.innerHTML = "";
+    el.grid.innerHTML = "";
+    solvedOrder = p.groups.map(function (_, i) { return i; })
+      .sort(function (a, b) { return p.groups[a].tier - p.groups[b].tier; });
+    solvedOrder.forEach(function (gi) { renderSolvedRow(gi, false); });
+    showFinishedControls();
+    revealInlineReview(true, { archiveView: true });
   }
 
   // ============================================================
@@ -524,22 +567,21 @@
   function openOverlay(o) { o.classList.add("show"); }
   function closeOverlay(o) { o.classList.remove("show"); }
 
-  el.reviewClose.addEventListener("click", function () { closeOverlay(el.reviewOverlay); });
-  el.reviewArchive.addEventListener("click", function () { closeOverlay(el.reviewOverlay); openArchive(); });
-  el.takeaways.addEventListener("click", function () { showReview(gameWon); });
+  el.reviewArchive.addEventListener("click", openArchive);
+  el.takeaways.addEventListener("click", function () { revealInlineReview(gameWon, { archiveView: viewingArchive }); });
   el.finishedArchive.addEventListener("click", openArchive);
   el.archiveBtn.addEventListener("click", openArchive);
   el.archiveCloseBtn.addEventListener("click", function () { closeOverlay(el.archiveOverlay); });
   el.howBtn.addEventListener("click", function () { openOverlay(el.howOverlay); });
   el.howCloseBtn.addEventListener("click", function () { closeOverlay(el.howOverlay); });
 
-  [el.reviewOverlay, el.archiveOverlay, el.howOverlay].forEach(function (o) {
+  [el.archiveOverlay, el.howOverlay].forEach(function (o) {
     o.addEventListener("click", function (e) { if (e.target === o) closeOverlay(o); });
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
       closeLightbox();
-      [el.reviewOverlay, el.archiveOverlay, el.howOverlay].forEach(closeOverlay);
+      [el.archiveOverlay, el.howOverlay].forEach(closeOverlay);
     }
   });
 

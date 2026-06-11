@@ -424,6 +424,40 @@ html, body {
 }
 .sheet-actions { display: flex; gap: var(--sp-sm); flex-wrap: wrap; margin-top: var(--sp-md); }
 
+/* ---------- inline review (end-of-game, slides in under the board) ---------- */
+.review-inline {
+  max-width: 820px;
+  margin: 4px auto 0;
+  padding: 0 var(--sp-md) var(--sp-xl);
+  scroll-margin-top: 84px;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 400ms var(--ease-out-quart), transform 400ms var(--ease-out-quart);
+}
+.review-inline[hidden] { display: none; }
+.review-inline.show { opacity: 1; transform: none; }
+.review-inner {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--sp-lg);
+  box-shadow: var(--shadow-menu);
+}
+.review-h {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  margin: 0 0 6px;
+  text-align: center;
+}
+#reviewGroups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--sp-md);
+  margin-top: var(--sp-md);
+}
+#reviewGroups .review-group { margin-bottom: 0; }
+.review-inline .sheet-actions { justify-content: center; }
+
 /* archive list */
 .archive-item {
   display: flex; align-items: center; justify-content: space-between;

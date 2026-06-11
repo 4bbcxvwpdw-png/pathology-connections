@@ -1,0 +1,6 @@
+# macOS / editor junk
+.DS_Store
+.Rhistory
+
+# impeccable design-process notes (kept local, not published)
+.impeccable/

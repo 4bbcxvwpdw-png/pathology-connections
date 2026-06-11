@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Councilman body histology placeholder">
+  <defs>
+    <radialGradient id="bg3" cx="45%" cy="50%" r="80%">
+      <stop offset="0%" stop-color="#f6ddd2"/>
+      <stop offset="100%" stop-color="#dd9a7e"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg3)"/>
+  <g fill="#7d3a6e" opacity="0.7">
+    <circle cx="100" cy="100" r="13"/><circle cx="300" cy="90" r="12"/><circle cx="80" cy="300" r="13"/>
+    <circle cx="320" cy="310" r="12"/><circle cx="200" cy="60" r="11"/>
+  </g>
+  <!-- shrunken apoptotic (Councilman) body: rounded, deeply eosinophilic -->
+  <circle cx="200" cy="200" r="46" fill="#b5482c" opacity="0.95"/>
+  <circle cx="200" cy="200" r="46" fill="none" stroke="#6e2417" stroke-width="5"/>
+  <circle cx="186" cy="192" r="9" fill="#5a1f3f"/>
+  <rect x="0" y="360" width="400" height="40" fill="#4a1d39" opacity="0.78"/>
+  <text x="200" y="386" font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="18" fill="#fff" text-anchor="middle" letter-spacing="0.5">PLACEHOLDER — swap with real image</text>
+</svg>

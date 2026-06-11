@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Mallory body histology placeholder">
+  <defs>
+    <radialGradient id="bg2" cx="50%" cy="50%" r="80%">
+      <stop offset="0%" stop-color="#f4d7d0"/>
+      <stop offset="100%" stop-color="#d98f7d"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg2)"/>
+  <!-- hepatocyte nuclei -->
+  <g fill="#7d3a6e" opacity="0.7">
+    <circle cx="90" cy="110" r="14"/><circle cx="210" cy="80" r="13"/><circle cx="320" cy="140" r="14"/>
+    <circle cx="120" cy="280" r="13"/><circle cx="270" cy="300" r="14"/><circle cx="330" cy="250" r="12"/>
+  </g>
+  <!-- ropey eosinophilic Mallory-Denk inclusions -->
+  <g stroke="#9c3b28" stroke-width="9" stroke-linecap="round" fill="none" opacity="0.9">
+    <path d="M150 170 q30 -25 60 0 t60 5"/>
+    <path d="M140 210 q40 30 90 10"/>
+    <path d="M170 250 q35 -20 70 5"/>
+  </g>
+  <rect x="0" y="360" width="400" height="40" fill="#4a1d39" opacity="0.78"/>
+  <text x="200" y="386" font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="18" fill="#fff" text-anchor="middle" letter-spacing="0.5">PLACEHOLDER — swap with real image</text>
+</svg>

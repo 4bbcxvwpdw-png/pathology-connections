@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Negri body histology placeholder">
+  <defs>
+    <radialGradient id="bg4" cx="50%" cy="50%" r="80%">
+      <stop offset="0%" stop-color="#f0d9e6"/>
+      <stop offset="100%" stop-color="#c98bb0"/>
+    </radialGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg4)"/>
+  <!-- large neuron cytoplasm -->
+  <ellipse cx="200" cy="205" rx="120" ry="100" fill="#e3a9c4" opacity="0.85"/>
+  <ellipse cx="200" cy="205" rx="120" ry="100" fill="none" stroke="#8a3f6d" stroke-width="4" opacity="0.7"/>
+  <!-- nucleus pushed to side -->
+  <circle cx="150" cy="170" r="26" fill="#6e2f54"/>
+  <circle cx="158" cy="164" r="8" fill="#3a1730"/>
+  <!-- eosinophilic cytoplasmic Negri inclusions -->
+  <ellipse cx="240" cy="230" rx="26" ry="18" fill="#b5482c" opacity="0.92"/>
+  <ellipse cx="210" cy="260" rx="16" ry="12" fill="#b5482c" opacity="0.85"/>
+  <rect x="0" y="360" width="400" height="40" fill="#4a1d39" opacity="0.78"/>
+  <text x="200" y="386" font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="18" fill="#fff" text-anchor="middle" letter-spacing="0.5">PLACEHOLDER — swap with real image</text>
+</svg>

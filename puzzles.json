@@ -1,0 +1,55 @@
+{
+  "puzzles": [
+    {
+      "date": "2026-06-15",
+      "title": "Week of June 15",
+      "author": "Pathology Interest Group",
+      "groups": [
+        {
+          "name": "Caseating granuloma: classic causes",
+          "tier": 1,
+          "explanation": "All four classically produce CASEATING (necrotizing, \"cheese-like\") granulomas. TB is the prototype; the endemic dimorphic fungi (Histoplasma, Coccidioides, Blastomyces) mimic it on biopsy. The trap is the next group: granulomas that look similar but are non-caseating.",
+          "tiles": [
+            { "text": "Tuberculosis" },
+            { "text": "Histoplasmosis" },
+            { "text": "Coccidioidomycosis" },
+            { "text": "Blastomycosis" }
+          ]
+        },
+        {
+          "name": "Non-caseating granuloma: classic causes",
+          "tier": 2,
+          "explanation": "These form granulomas WITHOUT central caseous necrosis. Sarcoidosis is the board favorite (non-caseating granulomas + asteroid/Schaumann bodies). Crohn disease, berylliosis (chronic beryllium lung disease), and foreign-body reactions round out the group. Berylliosis is the trap with the asbestos group: both are occupational lung disease.",
+          "tiles": [
+            { "text": "Sarcoidosis" },
+            { "text": "Crohn disease" },
+            { "text": "Berylliosis" },
+            { "text": "Foreign body reaction" }
+          ]
+        },
+        {
+          "name": "Named histologic \"bodies\" (image group)",
+          "tier": 3,
+          "explanation": "Eponymous inclusions you ID on a slide. Psammoma body = lamellated calcification (papillary thyroid, meningioma, serous ovarian). Mallory–Denk body = ropey eosinophilic keratin in alcoholic hepatitis. Councilman body = apoptotic hepatocyte (viral hepatitis, yellow fever). Negri body = cytoplasmic inclusion in rabies. The trap: \"Ferruginous body\" in the next group also ends in \"body.\"",
+          "tiles": [
+            { "image": "images/psammoma-body.svg", "alt": "Lamellated concentric calcification", "text": "Psammoma body" },
+            { "image": "images/mallory-body.svg", "alt": "Ropey eosinophilic hepatocyte inclusions", "text": "Mallory–Denk body" },
+            { "image": "images/councilman-body.svg", "alt": "Shrunken apoptotic hepatocyte", "text": "Councilman body" },
+            { "image": "images/negri-body.svg", "alt": "Cytoplasmic neuronal inclusion", "text": "Negri body" }
+          ]
+        },
+        {
+          "name": "Asbestos exposure: associated findings",
+          "tier": 4,
+          "explanation": "The asbestos story. Ferruginous (asbestos) bodies = golden-brown beaded fibers on iron stain; note it ends in \"body,\" the trap with group 3. Pleural plaques are the most common finding (benign). Asbestos raises risk of BOTH bronchogenic carcinoma (the most common cancer it causes) and mesothelioma (the most specific). Smoking multiplies the bronchogenic-carcinoma risk; mesothelioma risk is independent of smoking.",
+          "tiles": [
+            { "text": "Ferruginous body" },
+            { "text": "Pleural plaques" },
+            { "text": "Mesothelioma" },
+            { "text": "Bronchogenic carcinoma" }
+          ]
+        }
+      ]
+    }
+  ]
+}
